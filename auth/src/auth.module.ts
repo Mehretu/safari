@@ -2,17 +2,15 @@ import { Module } from '@nestjs/common';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { UsersModule } from '../users/users.module';
-import { JwtModule, JwtService } from '@nestjs/jwt';
-import { jwtConstants } from '../constants';
-import { APP_GUARD, Reflector } from '@nestjs/core';
+import { JwtModule } from '@nestjs/jwt';
+import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from '../auth.guard';
 import { LoggerModule } from 'nestjs-pino';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import * as Joi from 'joi';
 import { HealthModule } from 'libs/common/src/health';
-import { UserRepository } from 'auth/users/repositories/user.repository';
 import { RolesGuard } from 'auth/roles.guard';
-
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 
 @Module({
   controllers: [AuthController],
@@ -25,6 +23,10 @@ import { RolesGuard } from 'auth/roles.guard';
     {
       provide: APP_GUARD,
       useClass: RolesGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
     },
   ],
   imports: [
@@ -60,6 +62,10 @@ import { RolesGuard } from 'auth/roles.guard';
         },
       }),
       inject: [ConfigService],
+    }),
+    ThrottlerModule.forRoot({
+      ttl: 6000,
+      limit: 10,
     }),
     HealthModule,
   ],

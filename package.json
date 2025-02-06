@@ -26,6 +26,7 @@
     "@nestjs/jwt": "^11.0.0",
     "@nestjs/microservices": "^11.0.7",
     "@nestjs/platform-express": "^11.0.1",
+    "@nestjs/throttler": "^6.4.0",
     "@nestjs/typeorm": "github:nestjs/typeorm",
     "bcrypt": "^5.1.1",
     "class-validator": "^0.14.1",
