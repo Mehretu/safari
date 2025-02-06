@@ -1,10 +1,10 @@
 import { Entity, ObjectIdColumn, Column } from 'typeorm';
 import { Role } from '../../auth/dto/role.enum';
+import { AbstractEntity } from 'libs/common/src/abstract.schema';
 
 @Entity('users')
-export class User {
-    @ObjectIdColumn()
-    id: string;
+export class User extends AbstractEntity {
+    
 
     @Column({ unique: true })
     username: string;
@@ -34,6 +34,5 @@ export class User {
     @Column({ default: true })
     isActive: boolean;
 
-    @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-    createdAt: Date;
+
 } 
