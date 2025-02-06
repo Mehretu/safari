@@ -1,5 +1,5 @@
 import { Injectable, UnprocessableEntityException } from '@nestjs/common';
-import { CreateUserDto } from 'auth/auth/dto/createUser.dto';
+import { CreateUserDto } from 'auth/src/dto/createUser.dto';
 import { UserRepository } from './repositories/user.repository';
 import * as bcrypt from 'bcrypt';
 

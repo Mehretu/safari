@@ -1,7 +1,8 @@
-import { Controller, HttpStatus, HttpCode, Post, Body, UseGuards, Get, Request } from '@nestjs/common';
+import { Controller, HttpStatus, HttpCode, Post, Body, UseGuards, Get, Request, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { AuthGuard } from 'auth/auth.guard';
 import { Public } from '../constants';
+import { SignInDto } from './dto/sign-in.dto';
+import { Response } from 'express';
 @Controller('auth')
 export class AuthController {
     constructor(
@@ -11,8 +12,13 @@ export class AuthController {
     @Public()
     @HttpCode(HttpStatus.OK)
     @Post('login')
-    signIn(@Body() signInDto: Record<string, any>) {
-        return this.authService.signIn(signInDto.username, signInDto.password);
+    async signIn(
+        @Body() signInDto: SignInDto,
+        @Res({passthrough: true}) response: Response) {
+        const jwt = await this.authService.signIn(signInDto,response);
+        return {
+            access_token: jwt,
+        };
     }
 
     @Get('profile')

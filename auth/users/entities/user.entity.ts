@@ -1,6 +1,6 @@
 import { Entity, ObjectIdColumn, Column } from 'typeorm';
-import { Role } from '../../auth/dto/role.enum';
-import { AbstractEntity } from 'libs/common/src/abstract.schema';
+import { Role } from '../../src/dto/role.enum';
+import { AbstractEntity } from 'libs/common/src/database/abstract.schema';
 
 @Entity('users')
 export class User extends AbstractEntity {

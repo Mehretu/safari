@@ -1,5 +1,5 @@
 import { User } from '../entities/user.entity';
-import { CreateUserDto } from '../../auth/dto/createUser.dto';
+import { CreateUserDto } from '../../src/dto/createUser.dto';
 
 export interface IUserRepository {
     findOne(username: string): Promise<User | undefined>;

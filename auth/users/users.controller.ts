@@ -1,8 +1,8 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { Roles } from '../constants';
-import { CreateUserDto } from 'auth/auth/dto/createUser.dto';
-import { Role } from 'auth/auth/dto/role.enum';
+import { Public, Roles } from '../constants';
+import { CreateUserDto } from 'auth/src/dto/createUser.dto';
+import { Role } from 'auth/src/dto/role.enum';
 import { CurrentUser } from 'libs/common/src/decorators/current-user.decorator';
 import { User } from './entities/user.entity';
 
@@ -14,6 +14,7 @@ export class UsersController {
 
     @Post()
     @Roles(Role.Admin)
+    // @Public()
     async create(@Body() createUserDto: CreateUserDto) {
         return this.usersService.create(createUserDto);
     }

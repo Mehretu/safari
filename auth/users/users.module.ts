@@ -6,18 +6,21 @@ import { RolesGuard } from 'auth/roles.guard';
 import { UserRepository } from './repositories/user.repository';
 import { DataSource } from 'typeorm';
 import { User } from './entities/user.entity';
+import { DatabaseModule } from 'libs/common/src/database/database.module';
+import { AuthGuard } from 'auth/auth.guard';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
+  imports: [
+  DatabaseModule,
+  ],
   providers: [
     UsersService,
     {
-      provide: APP_GUARD,
-      useClass: RolesGuard,
-    },
-    {
       provide: UserRepository,
       useFactory: (dataSource: DataSource) => {
-        return new UserRepository(dataSource.getRepository(User));
+        return new UserRepository(dataSource);
       },
       inject: [DataSource],
     }
