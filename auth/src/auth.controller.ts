@@ -1,8 +1,11 @@
-import { Controller, HttpStatus, HttpCode, Post, Body, UseGuards, Get, Request, Res } from '@nestjs/common';
+import { Controller, HttpStatus, HttpCode, Post, Body, UseGuards, Get, Request, Res, Patch } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Public } from '../constants';
 import { SignInDto } from './dto/sign-in.dto';
 import { Response } from 'express';
+import { User } from 'auth/users/entities/user.entity';
+import { CurrentUser } from 'libs/common/src/decorators/current-user.decorator';
+import { ChangePasswordDto } from './dto/change-password.dto';
 @Controller('auth')
 export class AuthController {
     constructor(
@@ -19,6 +22,18 @@ export class AuthController {
         return {
             access_token: jwt,
         };
+    }
+
+    @Patch('change-password')
+    async changePassword(
+        @CurrentUser() user: User,
+        @Body() changePasswordDto: ChangePasswordDto,
+    ){
+        return this.authService.changePassword(
+            user._id, 
+            changePasswordDto.oldPassword,
+            changePasswordDto.newPassword,
+        );
     }
 
     @Get('profile')

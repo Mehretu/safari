@@ -1,4 +1,4 @@
-import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { UserRepository } from 'auth/users/repositories/user.repository';
@@ -7,6 +7,7 @@ import { Response } from 'express';
 import { SignInDto } from './dto/sign-in.dto';
 import * as bcrypt from 'bcrypt';
 import { User } from 'auth/users/entities/user.entity';
+import { ObjectId } from 'typeorm';
 @Injectable()
 export class AuthService {
     private readonly logger = new Logger(AuthService.name);
@@ -60,5 +61,32 @@ export class AuthService {
 
         return token;
 
+    }
+
+    async changePassword(userId: ObjectId, oldPassword: string, newPassword: string){
+        const user = await this.userRepository.findOne({
+            _id: userId,
+        });
+
+        if(!user){
+            throw new UnauthorizedException();
+        }
+
+        const isPasswordValid = await bcrypt.compare(oldPassword, user.password);
+        if (!isPasswordValid) {
+            this.logger.warn(`Failed password change attempt for user ${userId}`);
+            throw new UnauthorizedException('Invalid old password');
+        }
+
+        const isSamePassword = await bcrypt.compare(newPassword, user.password);
+        if (isSamePassword) {
+            this.logger.warn(`New password is the same as the old password for user ${userId}`);
+            throw new BadRequestException('New password cannot be the same as the old password');
+        }
+
+        user.password = await bcrypt.hash(newPassword, 10);
+        await this.userRepository.findOneAndUpdate({_id: userId}, user);
+        this.logger.log(`Password changed successfully for user ${userId}`);
+        return { message: 'Password changed successfully' };
     }
 }
