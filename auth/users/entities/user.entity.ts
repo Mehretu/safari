@@ -34,5 +34,11 @@ export class User extends AbstractEntity {
     @Column({ default: true })
     isActive: boolean;
 
+    @Column({default: false})
+    requirePassworChange: boolean;
+
+    @Column({nullable: true})
+    lastPasswordChange: Date;
+
 
 } 

@@ -2,6 +2,9 @@ import { DataSource } from 'typeorm';
 import { User } from '../../auth/users/entities/user.entity';
 import { Role } from '../../auth/src/dto/role.enum';
 import * as bcrypt from 'bcrypt';
+import { Logger } from '@nestjs/common';
+
+const logger = new Logger('InitialAdminSeed');
 
 export const createInitialAdmin = async (dataSource: DataSource) => {
     const userRepository = dataSource.getRepository(User);
@@ -11,6 +14,8 @@ export const createInitialAdmin = async (dataSource: DataSource) => {
     });
 
     if (!adminExists) {
+        logger.log('Creating initial admin user...');
+
         const adminUser = userRepository.create({
             username: 'admin',
             password: await bcrypt.hash('admin123', 10), 
@@ -19,7 +24,8 @@ export const createInitialAdmin = async (dataSource: DataSource) => {
             nationalIdNumber: 'ADMIN001',
             phoneNumber: 'ADMIN001',
             city: 'AdminCity',
-            isActive: true
+            isActive: true,
+            requirePasswordChange: true
         });
 
         await userRepository.save(adminUser);
