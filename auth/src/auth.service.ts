@@ -35,7 +35,7 @@ export class AuthService {
 
     async signIn(signInDto: SignInDto, response: Response){
 
-        const user = await this.validateUser(signInDto.username, signInDto.password);
+        const user = await this.validateUser(signInDto.email, signInDto.password);
 
         const payload = { 
             userId: user._id.toHexString(), 

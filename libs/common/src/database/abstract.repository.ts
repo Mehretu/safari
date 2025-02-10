@@ -12,12 +12,15 @@ export abstract class AbstractRepository<T extends AbstractEntity> {
         return this.repository.save(createdDocument);
     }
 
-    async findOne(filterQuery: FindOptionsWhere<T>): Promise<T> {
+    async findOne(
+        filterQuery: FindOptionsWhere<T>,
+        options: {throwNotFoundException?: boolean} = {throwNotFoundException: true}
+    ): Promise<T | null> {
         const document = await this.repository.findOne({
             where: filterQuery
         })
 
-        if (!document) {
+        if (!document && options.throwNotFoundException) {
             this.logger.warn('Document was not found with filterQuery', filterQuery);
             throw new NotFoundException('Document not found');
         }

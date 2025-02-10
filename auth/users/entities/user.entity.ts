@@ -1,6 +1,7 @@
 import { Entity, ObjectIdColumn, Column } from 'typeorm';
 import { Role } from '../../../auth/src/dto/role.enum';
 import { AbstractEntity } from 'libs/common/src/database/abstract.schema';
+import { Matches } from 'class-validator';
 
 @Entity('users')
 export class User extends AbstractEntity {
@@ -22,6 +23,7 @@ export class User extends AbstractEntity {
     nationalIdNumber: string;
 
     @Column()
+    @Matches(/^\+251[0-9]{9}$/, {message: 'Invalid phone number'})
     phoneNumber: string;
 
     @Column()

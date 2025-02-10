@@ -32,7 +32,7 @@ export class UsersService {
                 email: rest.email,
                 phoneNumber: rest.phoneNumber,
                 nationalIdNumber: rest.nationalIdNumber
-            })
+            }, {throwNotFoundException: false})
             if(existingUser){
                 throw new UnprocessableEntityException('User already exists');
             }
