@@ -17,9 +17,9 @@ export class AuthService {
         private configService: ConfigService
     ) {}
 
-    async validateUser(username: string, password: string): Promise<User>{
+    async validateUser(email: string, password: string): Promise<User>{
         const user = await this.userRepository.findOne({
-            username: username,
+            email: email,
         });
 
         if(!user){
@@ -39,7 +39,7 @@ export class AuthService {
 
         const payload = { 
             userId: user._id.toHexString(), 
-            username: user.username,
+            email: user.email,
             roles: user.roles
         };
 
@@ -59,13 +59,18 @@ export class AuthService {
             sameSite: 'strict'
         });
 
-        return token;
+        return {
+            access_token: token,
+            requirePasswordChange: user.requirePasswordChange,
+            email: user.email,
+            roles: user.roles
+        };
 
     }
 
-    async changePassword(userId: ObjectId, oldPassword: string, newPassword: string){
+    async changePassword(email: string, oldPassword: string, newPassword: string){
         const user = await this.userRepository.findOne({
-            _id: userId,
+            email: email,
         });
 
         if(!user){
@@ -74,19 +79,21 @@ export class AuthService {
 
         const isPasswordValid = await bcrypt.compare(oldPassword, user.password);
         if (!isPasswordValid) {
-            this.logger.warn(`Failed password change attempt for user ${userId}`);
+            this.logger.warn(`Failed password change attempt for user ${email}`);
             throw new UnauthorizedException('Invalid old password');
         }
 
         const isSamePassword = await bcrypt.compare(newPassword, user.password);
         if (isSamePassword) {
-            this.logger.warn(`New password is the same as the old password for user ${userId}`);
+            this.logger.warn(`New password is the same as the old password for user ${email}`);
             throw new BadRequestException('New password cannot be the same as the old password');
         }
 
         user.password = await bcrypt.hash(newPassword, 10);
-        await this.userRepository.findOneAndUpdate({_id: userId}, user);
-        this.logger.log(`Password changed successfully for user ${userId}`);
+        user.requirePasswordChange = false;
+        user.lastPasswordChange = new Date();
+        await this.userRepository.findOneAndUpdate({email: email}, user);
+        this.logger.log(`Password changed successfully for user ${email}`);
         return { message: 'Password changed successfully' };
     }
 }

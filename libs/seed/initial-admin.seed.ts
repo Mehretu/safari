@@ -10,14 +10,15 @@ export const createInitialAdmin = async (dataSource: DataSource) => {
     const userRepository = dataSource.getRepository(User);
     
     const adminExists = await userRepository.findOne({ 
-        where: { username: 'admin' } 
+        where: { email: 'admin@example.com' } 
     });
 
     if (!adminExists) {
         logger.log('Creating initial admin user...');
 
         const adminUser = userRepository.create({
-            username: 'admin',
+            firstName: 'Admin',
+            lastName: 'Admin',
             password: await bcrypt.hash('admin123', 10), 
             email: 'admin@example.com',
             roles: [Role.Admin],
@@ -25,10 +26,10 @@ export const createInitialAdmin = async (dataSource: DataSource) => {
             phoneNumber: 'ADMIN001',
             city: 'AdminCity',
             isActive: true,
-            requirePasswordChange: true
+            requirePasswordChange: true        
         });
-
         await userRepository.save(adminUser);
-        console.log('Initial admin user created');
+        logger.log('Initial admin user created', adminUser);
+
     }
 };

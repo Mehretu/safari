@@ -20,7 +20,10 @@ export class AuthController {
         @Res({passthrough: true}) response: Response) {
         const jwt = await this.authService.signIn(signInDto,response);
         return {
-            access_token: jwt,
+            access_token: jwt.access_token,
+            requirePasswordChange: jwt.requirePasswordChange,
+            email: jwt.email,
+            roles: jwt.roles
         };
     }
 
@@ -30,7 +33,7 @@ export class AuthController {
         @Body() changePasswordDto: ChangePasswordDto,
     ){
         return this.authService.changePassword(
-            user._id, 
+            user.email, 
             changePasswordDto.oldPassword,
             changePasswordDto.newPassword,
         );

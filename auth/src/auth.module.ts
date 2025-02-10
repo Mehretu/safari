@@ -63,10 +63,10 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
       }),
       inject: [ConfigService],
     }),
-    ThrottlerModule.forRoot({
-      ttl: 6000,
+    ThrottlerModule.forRoot([{
+      ttl: 60000,
       limit: 10,
-    }),
+    }]),
     HealthModule,
   ],
   exports: [AuthService],

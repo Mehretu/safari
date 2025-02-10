@@ -13,7 +13,7 @@ export class UsersController {
     ) {}
 
     @Post()
-    @Roles(Role.Admin)
+    @Roles(Role.User)
     // @Public()
     async create(@Body() createUserDto: CreateUserDto) {
         return this.usersService.create(createUserDto);

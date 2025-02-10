@@ -1,13 +1,16 @@
 import { Entity, ObjectIdColumn, Column } from 'typeorm';
-import { Role } from '../../src/dto/role.enum';
+import { Role } from '../../../auth/src/dto/role.enum';
 import { AbstractEntity } from 'libs/common/src/database/abstract.schema';
 
 @Entity('users')
 export class User extends AbstractEntity {
     
 
-    @Column({ unique: true })
-    username: string;
+    @Column()
+    firstName: string;
+
+    @Column()
+    lastName: string;
 
     @Column()
     password: string;
@@ -35,7 +38,7 @@ export class User extends AbstractEntity {
     isActive: boolean;
 
     @Column({default: false})
-    requirePassworChange: boolean;
+    requirePasswordChange: boolean;
 
     @Column({nullable: true})
     lastPasswordChange: Date;
