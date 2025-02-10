@@ -45,5 +45,11 @@ export class User extends AbstractEntity {
     @Column({nullable: true})
     lastPasswordChange: Date;
 
+    @Column({nullable: true})
+    resetPasswordToken: string | null;
+
+    @Column({nullable: true})
+    resetPasswordTokenExpires: Date | null;
+
 
 } 

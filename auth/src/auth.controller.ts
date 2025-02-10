@@ -6,6 +6,7 @@ import { Response } from 'express';
 import { User } from 'auth/users/entities/user.entity';
 import { CurrentUser } from 'libs/common/src/decorators/current-user.decorator';
 import { ChangePasswordDto } from './dto/change-password.dto';
+import { RequestResetPasswordDto, ResetPasswordDto } from './dto/reset-password.dto';
 @Controller('auth')
 export class AuthController {
     constructor(
@@ -37,6 +38,21 @@ export class AuthController {
             changePasswordDto.oldPassword,
             changePasswordDto.newPassword,
         );
+    }
+    @Post('reset-password-request')
+    @Public()
+    async requestPasswordReset(
+        @Body() requestPasswordResetDto: RequestResetPasswordDto
+    ){
+        return this.authService.requestResetPassword(requestPasswordResetDto.email);
+    }
+
+    @Post('reset-password')
+    @Public()
+    async resetPassword(
+        @Body() resetPasswordDto: ResetPasswordDto
+    ){
+        return this.authService.resetPassword(resetPasswordDto);
     }
 
     @Get('profile')

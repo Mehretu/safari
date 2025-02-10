@@ -11,6 +11,7 @@ import * as Joi from 'joi';
 import { HealthModule } from 'libs/common/src/health';
 import { RolesGuard } from 'auth/roles.guard';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { MailModule } from 'libs/common/src/mail/mailer.module';
 
 @Module({
   controllers: [AuthController],
@@ -31,6 +32,7 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
   ],
   imports: [
     UsersModule,
+    MailModule,
     LoggerModule.forRootAsync({
       useFactory: () => ({
         pinoHttp:{
