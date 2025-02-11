@@ -51,5 +51,14 @@ export class User extends AbstractEntity {
     @Column({nullable: true})
     resetPasswordTokenExpires: Date | null;
 
+    @Column({default: false})
+    isPhoneVerified: boolean;
+
+    @Column({nullable: true})
+    phoneVerificationCode: string;
+
+    @Column({nullable: true})
+    phoneVerificationCodeExpires: Date;
+
 
 } 

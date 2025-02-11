@@ -6,7 +6,6 @@ import { Response } from 'express';
 import { SignInDto } from './dto/sign-in.dto';
 import * as bcrypt from 'bcrypt';
 import { User } from 'auth/users/entities/user.entity';
-import { randomBytes } from 'crypto';
 import { addHours } from 'date-fns';
 import { MailerService } from '@nestjs-modules/mailer';
 import { ResetPasswordDto } from './dto/reset-password.dto';
@@ -17,7 +16,7 @@ export class AuthService {
         private jwtService: JwtService,
         private userRepository: UserRepository,
         private configService: ConfigService,
-        private mailService: MailerService
+        private mailService: MailerService,
     ) {}
 
     async validateUser(email: string, password: string): Promise<User>{
@@ -173,4 +172,7 @@ export class AuthService {
         return { message: 'Password reset successful'};
 
     }
+   
+
+    
 }
