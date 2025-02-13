@@ -5,10 +5,12 @@ import * as bcrypt from 'bcrypt';
 import { Role } from '@app/auth/dto/role.enum';
 import { addMinutes } from 'date-fns';
 import { SignupSessionService } from '@app/auth/services/signup-session.service';
-import { CompleteSignupDto, VerifyPhoneDto } from '@app/auth/dto/verify-phone.dto';
+import { CompleteSignupDto, DocumentsDto } from '@app/auth/dto/verify-phone.dto';
 import { TwilioService } from 'libs/common/src/sms/twilio.service';
 import { firstValueFrom } from 'rxjs';
 import { ClientProxy } from '@nestjs/microservices';
+import { MinioService } from '@app/common/storage/minio.service';
+import { BufferedFile } from '@app/common/storage/file.model';
 
 
 @Injectable()
@@ -18,6 +20,7 @@ export class UsersService {
         private readonly userRepository: UserRepository,
         private readonly signupSessionService: SignupSessionService,
         private readonly twilioService: TwilioService,
+        private readonly minioService: MinioService,
         @Inject('VEHICLE_SERVICE') private readonly vehicleClient: ClientProxy
     ) {}
  
@@ -113,6 +116,84 @@ export class UsersService {
 
         this.signupSessionService.removeSession(phoneNumber);
         return user;
+    }
+    private async uploadDocuments(documents: DocumentsDto): Promise<any>{
+
+        try{
+
+            const uploadPromises: Promise<[string, string]>[] = [];
+            if(documents.driverLicenseFront){
+                uploadPromises.push(
+                    this.minioService.upload(
+                        this.convertBase64ToBuffer(documents.driverLicenseFront),
+                        'driver-license-front'
+                    ).then((url): [string, string] => ['driverLicenseFront', url])
+                );
+            }
+            if(documents.driverLicenseBack){
+                uploadPromises.push(
+                    this.minioService.upload(
+                        this.convertBase64ToBuffer(documents.driverLicenseBack),
+                        'driver-license-back'
+                    ).then((url): [string, string] => ['driverLicenseBack', url])
+                );
+            }
+            if(documents.nationalIdFront){
+                uploadPromises.push(
+                    this.minioService.upload(
+                        this.convertBase64ToBuffer(documents.nationalIdFront),
+                        'national-id-front'
+                    ).then((url): [string, string] => ['nationalIdFront', url])
+                );
+            }
+            if(documents.nationalIdBack){
+                uploadPromises.push(
+                    this.minioService.upload(
+                        this.convertBase64ToBuffer(documents.nationalIdBack),
+                        'national-id-back'
+                    ).then((url): [string, string] => ['nationalIdBack', url])
+                );
+            }
+            if(documents.vehicleInsurance){
+                uploadPromises.push(
+                    this.minioService.upload(
+                        this.convertBase64ToBuffer(documents.vehicleInsurance),
+                        'vehicle-insurance'
+                    ).then((url): [string, string] => ['vehicleInsurance', url])
+                );
+            }
+            if(documents.vehicleRegistration){
+                uploadPromises.push(
+                    this.minioService.upload(
+                        this.convertBase64ToBuffer(documents.vehicleRegistration),
+                        'vehicle-registration'
+                    ).then((url): [string, string] => ['vehicleRegistration', url])
+                );
+            }
+
+            const uploadedDocuments = await Promise.all(uploadPromises);
+            return Object.fromEntries(uploadedDocuments);
+        } catch (error) {
+            this.logger.error(`Failed to upload documents: ${error.message}`);
+            throw new InternalServerErrorException('Failed to upload documents');
+        }
+    }
+
+    private convertBase64ToBuffer(base64String: string): BufferedFile{
+        const matches = base64String.match(/^data:(.+);base64,(.+)$/);
+        if(!matches) throw new BadRequestException('Invalid base64 string');
+
+        const [, mimeType, data] = matches;
+        const fileBuffer = Buffer.from(data, 'base64');
+        const file = {
+            fieldname: 'file',
+            originalname: `${Date.now()}-${Math.random()}.${mimeType.split('/')[1]}`,
+            encoding: '7bit',
+            mimetype: mimeType,
+            size: fileBuffer.length,
+            buffer: fileBuffer
+        }
+        return file;
     }
 
     private async validateCreateUserDto(createUserDto: CreateUserDto) {
