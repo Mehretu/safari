@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { Public, Roles } from '../constants';
 import { CreateUserDto } from '@app/auth/dto/createUser.dto';
@@ -30,5 +30,11 @@ export class UsersController {
     @Roles(Role.Admin)
     async getUser(@CurrentUser() user: User) {
         return user;
+    }
+
+    @Get('vehicle-models/:makeId')
+    @Public()
+    async getVehicleModels(@Param('makeId') makeId: string){
+        return this.usersService.getVehicleModels(makeId);
     }
 }

@@ -41,7 +41,7 @@ export abstract class AbstractRepository<T extends AbstractEntity> {
         }
 
         Object.assign(document, update);
-        return this.repository.save(document);
+    return this.repository.save(document);
     }
 
     async find(filterQuery: FindOptionsWhere<T>): Promise<T[]> {

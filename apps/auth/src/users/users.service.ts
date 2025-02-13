@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, InternalServerErrorException, Logger, UnprocessableEntityException } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, InternalServerErrorException, Logger, UnprocessableEntityException } from '@nestjs/common';
 import { CreateUserDto } from '@app/auth/dto/createUser.dto';
 import { UserRepository } from './repositories/user.repository';
 import * as bcrypt from 'bcrypt';
@@ -7,6 +7,8 @@ import { addMinutes } from 'date-fns';
 import { SignupSessionService } from '@app/auth/services/signup-session.service';
 import { VerifyPhoneDto } from '@app/auth/dto/verify-phone.dto';
 import { TwilioService } from 'libs/common/src/sms/twilio.service';
+import { firstValueFrom } from 'rxjs';
+import { ClientProxy } from '@nestjs/microservices';
 
 
 @Injectable()
@@ -16,6 +18,7 @@ export class UsersService {
         private readonly userRepository: UserRepository,
         private readonly signupSessionService: SignupSessionService,
         private readonly twilioService: TwilioService,
+        @Inject('VEHICLE_SERVICE') private readonly vehicleClient: ClientProxy
     ) {}
  
 
@@ -34,14 +37,21 @@ export class UsersService {
         );
 
         try{
-            await this.twilioService.sendSMS(createUserDto.phoneNumber, `Your verification code is ${verificationCode}`);
+            await this.twilioService.sendSMS(
+                createUserDto.phoneNumber, 
+                `Your verification code is ${verificationCode}`);
         
 
         this.logger.debug(`Verification code for ${createUserDto.phoneNumber}: ${verificationCode}`);
 
+        const makes = await firstValueFrom(
+            this.vehicleClient.send('get-vehicle-makes', {})
+        )
+
         return {
             message: 'Please verify your phone number with the code sent via SMS',
-            expiresIn: '5 minutes'
+            expiresIn: '5 minutes',
+            makes
         };
         } catch (error) {
             this.logger.error(`Failed to send SMS to ${createUserDto.phoneNumber}: ${error.message}`);
@@ -49,8 +59,14 @@ export class UsersService {
         }
     }
 
+    async getVehicleModels(makeId: string){
+        return firstValueFrom(
+            this.vehicleClient.send('get-vehicle-models', {makeId})
+        )
+    }
+
     async verifyPhoneAndCompleteSignup(verifyPhoneDto: VerifyPhoneDto){
-        const {phoneNumber, otp} = verifyPhoneDto;
+        const {phoneNumber, otp, vehicleData} = verifyPhoneDto;
         const session = this.signupSessionService.getSession(phoneNumber);
         if(!session){
             throw new BadRequestException('No pending signup found for this phone number');
@@ -72,6 +88,17 @@ export class UsersService {
             password: hashedPassword,
             roles: [Role.User]
         });
+
+        if(vehicleData){
+            await firstValueFrom(
+                this.vehicleClient.send('create_vehicle_for_user', {
+                    userId: user._id,
+                    vehicleData
+                })
+            )
+        }
+
+
 
         this.signupSessionService.removeSession(phoneNumber);
         return user;

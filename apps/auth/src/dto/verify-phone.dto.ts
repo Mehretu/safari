@@ -11,6 +11,7 @@ export class SendPhoneVerificationDto {
 }
 
 export class VerifyPhoneDto {
+    
     @IsString()
     @Length(6, 6)
     otp: string;
@@ -18,4 +19,14 @@ export class VerifyPhoneDto {
     @IsString()
     @Matches(/^\+251[0-9]{9}$/)
     phoneNumber: string;
+
+    vehicleData: {
+        makeId: string;
+        modelId: string;
+        year: number;
+        color: string;
+        licensePlateNumber: string;
+        registrationNumber: string;
+        insurancePolicyNumber: string;
+    }
 }
