@@ -5,7 +5,7 @@ import { CreateUserDto } from '@app/auth/dto/createUser.dto';
 import { Role } from '@app/auth/dto/role.enum';
 import { CurrentUser } from 'libs/common/src/decorators/current-user.decorator';
 import { User } from './entities/user.entity';
-import { VerifyPhoneDto } from '@app/auth/dto/verify-phone.dto';
+import { CompleteSignupDto } from '@app/auth/dto/verify-phone.dto';
 
 @Controller('users')
 export class UsersController {
@@ -22,8 +22,8 @@ export class UsersController {
 
     @Post('verify-phone')
     @Public()
-    async verifyPhone(@Body() verifyPhoneDto: VerifyPhoneDto){
-        return this.usersService.verifyPhoneAndCompleteSignup(verifyPhoneDto);
+    async verifyPhone(@Body() completeSignupDto: CompleteSignupDto){
+        return this.usersService.verifyPhoneAndCompleteSignup(completeSignupDto);
     }
 
     @Get()

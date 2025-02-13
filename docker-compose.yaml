@@ -1,6 +1,6 @@
 services:
-  mongo:
-    image: mongo
+  # mongo:
+  #   image: mongo
   minio:
     image: minio/minio
     ports:
@@ -12,3 +12,6 @@ services:
     volumes:
       - minio_data:/data
     command: server /data --console-address ":9001"
+
+volumes:
+  minio_data:

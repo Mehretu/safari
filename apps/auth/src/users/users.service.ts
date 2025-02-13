@@ -63,9 +63,14 @@ export class UsersService {
     }
 
     async getVehicleModels(makeId: string){
-        return firstValueFrom(
-            this.vehicleClient.send('get-vehicle-models', {makeId})
-        )
+        try{
+            return await firstValueFrom(
+                this.vehicleClient.send('get-vehicle-models', {makeId})
+            )
+        } catch (error) {
+            this.logger.error(`Failed to get vehicle models for make ${makeId}: ${error.message}`);
+            throw new InternalServerErrorException('Failed to get vehicle models');
+        }
     }
 
     async verifyPhoneAndCompleteSignup(completeSignupDto: CompleteSignupDto){
@@ -105,12 +110,17 @@ export class UsersService {
             }
         });
 
+       try{
         await firstValueFrom(
             this.vehicleClient.send('create_vehicle_for_user', {
                 userId: user._id,
                 vehicleData
             })
         );
+       } catch (error) {
+        this.logger.error(`Failed to create vehicle for user ${user._id}: ${error.message}`);
+        throw new InternalServerErrorException('Failed to create vehicle');
+       }
 
 
 

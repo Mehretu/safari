@@ -1,11 +1,11 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as Minio from 'minio';
 import { BufferedFile } from './file.model';
 import * as crypto from 'crypto';
 
 @Injectable()
-export class MinioService {
+export class MinioService implements OnModuleInit{
     private readonly logger = new Logger(MinioService.name);
     private readonly minioClient: Minio.Client;
     private readonly bucketName: string;
@@ -61,7 +61,7 @@ export class MinioService {
             .createHash('md5')
             .update(`${file.originalname}${timestamp}`)
             .digest('hex');
-        const fileExtension = file.originalname.split('.').pop();
+        const fileExtension = file.originalname.split('.').pop() || 'bin';
         return `${hashedFileName}.${fileExtension}`;
     }
 

@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsObject, IsString, Length, Matches, ValidateNested } from "class-validator";
+import { IsNotEmpty, IsNumber, IsObject, IsString, Length, Matches, Max, Min, ValidateNested } from "class-validator";
 import { Type } from "class-transformer";
 
 export class SendPhoneVerificationDto {
@@ -11,27 +11,6 @@ export class SendPhoneVerificationDto {
     phoneNumber: string;
 }
 
-export class CompleteSignupDto {
-    
-    @IsString()
-    @Length(6, 6)
-    otp: string;
-
-    @IsString()
-    @Matches(/^\+251[0-9]{9}$/)
-    phoneNumber: string;
-
-    @IsObject()
-    @ValidateNested()
-    @Type(() => DocumentsDto)
-    documents: DocumentsDto;
-
-    @IsObject()
-    @ValidateNested()
-    @Type(() => VehicleDataDto)
-    vehicleData: VehicleDataDto;
-
-}
 
 export class VehicleDataDto {
     @IsString()
@@ -42,9 +21,10 @@ export class VehicleDataDto {
     @IsNotEmpty()
     modelId: string;
 
-    @IsString()
-    @IsNotEmpty()
-    year: string;
+    @IsNumber()
+    @Min(1900)
+    @Max(new Date().getFullYear() + 1)
+    year: number;
 
     @IsString()
     @IsNotEmpty()
@@ -89,4 +69,27 @@ export class DocumentsDto {
     vehicleRegistration: string;
 
 }
+
+export class CompleteSignupDto {
+    
+    @IsString()
+    @Length(6, 6)
+    otp: string;
+
+    @IsString()
+    @Matches(/^\+251[0-9]{9}$/)
+    phoneNumber: string;
+
+    @IsObject()
+    @ValidateNested()
+    @Type(() => DocumentsDto)
+    documents: DocumentsDto;
+
+    @IsObject()
+    @ValidateNested()
+    @Type(() => VehicleDataDto)
+    vehicleData: VehicleDataDto;
+
+}
+
 
