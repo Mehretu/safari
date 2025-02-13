@@ -1,5 +1,5 @@
 import { Entity, ObjectIdColumn, Column } from 'typeorm';
-import { Role } from '../../../auth/src/dto/role.enum';
+import { Role } from '@app/auth/dto/role.enum';
 import { AbstractEntity } from 'libs/common/src/database/abstract.schema';
 import { Matches } from 'class-validator';
 

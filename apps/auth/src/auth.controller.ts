@@ -1,9 +1,9 @@
 import { Controller, HttpStatus, HttpCode, Post, Body, UseGuards, Get, Request, Res, Patch } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { Public } from '../constants';
+import { Public } from './constants';
 import { SignInDto } from './dto/sign-in.dto';
 import { Response } from 'express';
-import { User } from 'auth/users/entities/user.entity';
+import { User } from './users/entities/user.entity';
 import { CurrentUser } from 'libs/common/src/decorators/current-user.decorator';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { RequestResetPasswordDto, ResetPasswordDto } from './dto/reset-password.dto';

@@ -1,11 +1,11 @@
 import { BadRequestException, Injectable, InternalServerErrorException, Logger, UnprocessableEntityException } from '@nestjs/common';
-import { CreateUserDto } from 'auth/src/dto/createUser.dto';
+import { CreateUserDto } from '@app/auth/dto/createUser.dto';
 import { UserRepository } from './repositories/user.repository';
 import * as bcrypt from 'bcrypt';
-import { Role } from 'auth/src/dto/role.enum';
+import { Role } from '@app/auth/dto/role.enum';
 import { addMinutes } from 'date-fns';
-import { SignupSessionService } from 'auth/src/services/signup-session.service';
-import { VerifyPhoneDto } from 'auth/src/dto/verify-phone.dto';
+import { SignupSessionService } from '@app/auth/services/signup-session.service';
+import { VerifyPhoneDto } from '@app/auth/dto/verify-phone.dto';
 import { TwilioService } from 'libs/common/src/sms/twilio.service';
 
 

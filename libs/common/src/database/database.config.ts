@@ -1,5 +1,5 @@
 import { ConfigService } from "@nestjs/config";
-import { User } from "auth/users/entities/user.entity";
+import { User } from "@app/auth/users/entities/user.entity";
 import { DataSource } from "typeorm";
 
 

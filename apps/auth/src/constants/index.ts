@@ -1,5 +1,5 @@
 import { SetMetadata } from "@nestjs/common";
-import { Role } from "./src/dto/role.enum";
+import { Role } from "@app/auth/dto/role.enum";
 
 export const jwtConstants = {
     secret: 'this is vvssdr18p15 secret key',

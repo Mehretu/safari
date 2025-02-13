@@ -1,6 +1,6 @@
 import { Injectable, CanActivate, ExecutionContext, Logger, ForbiddenException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { Role } from './src/dto/role.enum';
+import { Role } from '@app/auth/dto/role.enum';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -11,7 +11,7 @@ export class RolesGuard implements CanActivate {
     canActivate(context: ExecutionContext): boolean {
         const requiredRoles = this.reflector.getAllAndOverride<Role[]>('roles', [
             context.getHandler(),
-            context.getClass(),
+         context.getClass(),
         ]);
 
         this.logger.debug('RolesGuard executing');

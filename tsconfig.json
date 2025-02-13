@@ -17,6 +17,14 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": false,
-    "typeRoots": ["./node_modules/@types", "./auth/types"]
+    "typeRoots": [
+      "./node_modules/@types",
+      "./auth/types"
+    ],
+    "paths": {
+      "@app/auth/*": ["apps/auth/src/*"],
+      "@app/vehicles/*": ["apps/vehicles/src/*"],
+      "@app/common/*": ["libs/common/src/*"]
+    }
   }
 }
