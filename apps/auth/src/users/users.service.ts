@@ -5,7 +5,7 @@ import * as bcrypt from 'bcrypt';
 import { Role } from '@app/auth/dto/role.enum';
 import { addMinutes } from 'date-fns';
 import { SignupSessionService } from '@app/auth/services/signup-session.service';
-import { VerifyPhoneDto } from '@app/auth/dto/verify-phone.dto';
+import { CompleteSignupDto, VerifyPhoneDto } from '@app/auth/dto/verify-phone.dto';
 import { TwilioService } from 'libs/common/src/sms/twilio.service';
 import { firstValueFrom } from 'rxjs';
 import { ClientProxy } from '@nestjs/microservices';
@@ -65,8 +65,8 @@ export class UsersService {
         )
     }
 
-    async verifyPhoneAndCompleteSignup(verifyPhoneDto: VerifyPhoneDto){
-        const {phoneNumber, otp, vehicleData} = verifyPhoneDto;
+    async verifyPhoneAndCompleteSignup(completeSignupDto: CompleteSignupDto){
+        const {phoneNumber, otp, vehicleData, documents} = completeSignupDto;
         const session = this.signupSessionService.getSession(phoneNumber);
         if(!session){
             throw new BadRequestException('No pending signup found for this phone number');
@@ -83,20 +83,31 @@ export class UsersService {
 
         const userData = session.userData;
         const hashedPassword = await bcrypt.hash(userData.password, 10);
+        const uploadedDocuments = await this.uploadDocuments(documents);
         const user = await this.userRepository.create({
             ...userData,
             password: hashedPassword,
-            roles: [Role.User]
+            roles: [Role.User],
+            documents: {
+                driversLicense: {
+                    front: uploadedDocuments.driverLicenseFront,
+                    back: uploadedDocuments.driverLicenseBack
+                },
+                nationalId: {
+                    front: uploadedDocuments.nationalIdFront,
+                    back: uploadedDocuments.nationalIdBack
+                },
+                vehicleInsurance: uploadedDocuments.vehicleInsurance,
+                vehicleRegistration: uploadedDocuments.vehicleRegistration
+            }
         });
 
-        if(vehicleData){
-            await firstValueFrom(
-                this.vehicleClient.send('create_vehicle_for_user', {
-                    userId: user._id,
-                    vehicleData
-                })
-            )
-        }
+        await firstValueFrom(
+            this.vehicleClient.send('create_vehicle_for_user', {
+                userId: user._id,
+                vehicleData
+            })
+        );
 
 
 
